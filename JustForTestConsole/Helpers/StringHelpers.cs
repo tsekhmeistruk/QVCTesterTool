@@ -3,32 +3,36 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 
 namespace JustForTestConsole.Helpers
 {
     public static class StringHelpers
     {
-        public static List<string> ExtractFromString(
-            string text, string startString, string endString)
+        public static List<string> GetPackagesList(string cmdOutput)
         {
-            List<string> matched = new List<string>();
-            int indexStart = 0;
-            int indexEnd = 0;
-            bool exit = false;
-            while (!exit)
+            List<string> packages = new List<string>();
+            string pattern = "(package:)(.*)$";
+            Regex regex = new Regex(pattern, RegexOptions.Multiline | RegexOptions.Compiled);
+            foreach (Match device in regex.Matches(cmdOutput))
             {
-                indexStart = text.IndexOf(startString);
-                indexEnd = text.IndexOf(endString);
-                if (indexStart != -1 && indexEnd != -1)
-                {
-                    matched.Add(text.Substring(indexStart + startString.Length,
-                        indexEnd - indexStart - startString.Length));
-                    text = text.Substring(indexEnd + endString.Length);
-                }
-                else
-                    exit = true;
+                packages.Add(device.Groups[2].Value);
             }
-            return matched;
+            return packages;
+        }
+
+        public static List<string> GetDevicesId(string cmdOutput)
+        {
+            List<string> devices = new List<string>();
+            string pattern = "(\\w+)(\\s+)(device)\r\n";
+            Regex regex = new Regex(pattern, RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Compiled);
+            foreach (Match device in regex.Matches(cmdOutput))
+            {
+                devices.Add(device.Groups[1].Value);
+            }
+            return devices;
         }
     }
+
+
 }

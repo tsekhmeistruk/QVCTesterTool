@@ -7,6 +7,7 @@ using System.Threading;
 using JustForTestConsole.Enums;
 using JustForTestConsole.Helpers;
 using Microsoft.PowerShell.Core.Activities;
+using System.Text.RegularExpressions;
 
 namespace JustForTestConsole
 {
@@ -26,10 +27,20 @@ namespace JustForTestConsole
 
             //RunApp();
             //TestWeb();
+            //string input = "all devices are attached\nHJ763764  device\n34djfhJH   device";
+            string input = CmdShell.Execute("adb devices");
+            string pattern = "(\\w+)(\\t)(device)\r\n";
+            Regex regex = new Regex(pattern, RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Compiled);
+            foreach (Match device in regex.Matches(input))
+            {
+                Console.WriteLine(device.Groups[1].Value);
+            }
 
-            string f = "ddd *d* dddddd*gggggg *d*";
-            Console.WriteLine(f.Replace("*d*", "$r$"));
-            
+            //var output = CmdShell.Execute("adb shell \"pm list packages\"");
+            //foreach (var pack in StringHelpers.GetPackagesList(output))
+            //{
+            //    Console.WriteLine(pack);
+            //}
             Console.ReadKey();
         }
 

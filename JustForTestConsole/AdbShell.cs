@@ -43,7 +43,14 @@ namespace JustForTestConsole
 
         public List<string> GetDevices()
         {
-            throw new NotImplementedException();
+            List<string> devicesList = new List<string>();
+            var devices = CmdShell.Execute(DataStrings.adbDevices);
+            var ids = StringHelpers.GetDevicesId(devices);
+            foreach (var item in ids)
+            {
+                devicesList.Add(item);
+            }
+            return devicesList;
         }
 
         public List<string> GetAllPackagesList(string deviceId)
@@ -51,7 +58,7 @@ namespace JustForTestConsole
             const string filter = ".";
             string cmd = ReplaceMarks(DataStrings.adbPackagesGrep, deviceId, filter);
             var packages = CmdExecute(cmd);
-            List<string> packagesList = StringHelpers.ExtractFromString(packages, "package:", "\n");
+            List<string> packagesList = StringHelpers.GetPackagesList(packages);
             return packagesList;
         }
 
@@ -60,7 +67,7 @@ namespace JustForTestConsole
             //for qvc package filter should be 'com.qvc'
             string cmd = ReplaceMarks(DataStrings.adbPackagesGrep, deviceId, filter);
             var packages = CmdExecute(cmd);
-            List<string> packagesList = StringHelpers.ExtractFromString(packages, "package:", "\n");
+            List<string> packagesList = StringHelpers.GetPackagesList(packages);
             return packagesList;
         }
 

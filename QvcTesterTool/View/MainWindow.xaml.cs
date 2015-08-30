@@ -16,7 +16,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace QvcTesterTool
+namespace QvcTesterTool.View
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -28,14 +28,7 @@ namespace QvcTesterTool
         public MainWindow()
         {
 
-            InitializeComponent();
-            Collection = new ObservableCollection<string>()
-            {
-                "device1",
-                "device2",
-                "device3"
-            };
-            DataContext = this.Collection;
+            DataContext = new ViewModel.DevicesViewModel();
 
             
         }
