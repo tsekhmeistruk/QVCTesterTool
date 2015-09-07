@@ -16,7 +16,8 @@ namespace JustForTestConsole.Helpers
             Regex regex = new Regex(pattern, RegexOptions.Multiline | RegexOptions.Compiled);
             foreach (Match device in regex.Matches(cmdOutput))
             {
-                packages.Add(device.Groups[2].Value);
+                var package = device.Groups[2].Value;
+                packages.Add(Regex.Replace(package, "\r|\n|\t", ""));
             }
             return packages;
         }
@@ -24,7 +25,7 @@ namespace JustForTestConsole.Helpers
         public static List<string> GetDevicesId(string cmdOutput)
         {
             List<string> devices = new List<string>();
-            string pattern = "(\\w+)(\\s+)(device)\r\n";
+            string pattern = "(.*)(\\t)(device)\r\n";
             Regex regex = new Regex(pattern, RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Compiled);
             foreach (Match device in regex.Matches(cmdOutput))
             {

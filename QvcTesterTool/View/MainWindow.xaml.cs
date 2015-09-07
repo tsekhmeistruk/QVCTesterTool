@@ -27,23 +27,7 @@ namespace QvcTesterTool.View
 
         public MainWindow()
         {
-
-            DataContext = new ViewModel.DevicesViewModel();
-
-            
-        }
-
-        public void Add()
-        {
-            Collection.Add("newDevice");
-        }
-
-        public void Reset()
-        {
-            Collection = new ObservableCollection<string>()
-            {
-                "device1"
-            };
+            DataContext = new Core();
         }
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using JustForTestConsole.Data;
 using JustForTestConsole.Helpers;
 using JustForTestConsole.Interfaces;
+using System.Text.RegularExpressions;
 
 namespace JustForTestConsole
 {
@@ -55,8 +56,7 @@ namespace JustForTestConsole
 
         public List<string> GetAllPackagesList(string deviceId)
         {
-            const string filter = ".";
-            string cmd = ReplaceMarks(DataStrings.adbPackagesGrep, deviceId, filter);
+            string cmd = ReplaceMarks(DataStrings.adbPackages, deviceId);
             var packages = CmdExecute(cmd);
             List<string> packagesList = StringHelpers.GetPackagesList(packages);
             return packagesList;
@@ -69,6 +69,43 @@ namespace JustForTestConsole
             var packages = CmdExecute(cmd);
             List<string> packagesList = StringHelpers.GetPackagesList(packages);
             return packagesList;
+        }
+
+        public string GetBuildNumber(string package, string deviceId)
+        {
+            string cmd = String.Format("adb -s {1} shell \"dumpsys package {0} | grep versionName\"", package, deviceId);
+            return CmdExecute(cmd);
+        }
+
+        public string GetDeviceModel(string deviceId)
+        {
+            string cmd = String.Format("adb -s {0} shell \"getprop ro.product.model\"", deviceId);
+            string output = CmdExecute(cmd);
+            return Regex.Replace(output, "\r|\n|\t", "");
+        }
+
+        public string GetOsVersion(string deviceId)
+        {
+            string cmd = String.Format("adb -s {0} shell \"getprop ro.build.version.release\"", deviceId);
+            string output = CmdExecute(cmd);
+            return Regex.Replace(output, "\r|\n|\t", "");
+        }
+
+        public string GetSdkVersion(string deviceId)
+        {
+            string cmd = String.Format("adb -s {0} shell \"getprop ro.build.version.sdk\"", deviceId);
+            string output = CmdExecute(cmd);
+            return Regex.Replace(output, "\r|\n|\t", "");
+        }
+
+        public string GetBatteryLevel(string deviceId)
+        {
+            string cmd = String.Format("adb -s {0} shell cat /sys/class/power_supply/battery/*", deviceId);
+            string output = CmdExecute(cmd);
+            string pattern = "(POWER_SUPPLY_CAPACITY=)(\\d+)";
+            Regex regex = new Regex(pattern, RegexOptions.Compiled | RegexOptions.Multiline);
+            output = regex.Match(output).Groups[2].Value;
+            return Regex.Replace(output, "\r|\n|\t", "");
         }
 
         #region Private Methods

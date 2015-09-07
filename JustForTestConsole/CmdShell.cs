@@ -6,22 +6,24 @@ namespace JustForTestConsole
     {
         public static string Execute(string args)
         {
-            var pProcess = new Process();
+            using (var pProcess = new Process())
+            {
+                const string strCommand = "cmd.exe";
+                string arguments = "/c " + args;
 
-            const string strCommand = "cmd.exe";
-            string arguments = "/c " + args;
+                pProcess.StartInfo.FileName = strCommand;
+                pProcess.StartInfo.Arguments = arguments;
+                pProcess.StartInfo.UseShellExecute = false;
+                pProcess.StartInfo.RedirectStandardOutput = true;
+                pProcess.StartInfo.CreateNoWindow = true;
 
-            pProcess.StartInfo.FileName = strCommand;
-            pProcess.StartInfo.Arguments = arguments;
-            pProcess.StartInfo.UseShellExecute = false;
-            pProcess.StartInfo.RedirectStandardOutput = true;
+                pProcess.Start();
 
-            pProcess.Start();
+                string strOutput = pProcess.StandardOutput.ReadToEnd();
+                pProcess.WaitForExit();
 
-            string strOutput = pProcess.StandardOutput.ReadToEnd();
-            pProcess.WaitForExit();
-
-            return strOutput;
+                return strOutput;    
+            }           
         }
     }
 }

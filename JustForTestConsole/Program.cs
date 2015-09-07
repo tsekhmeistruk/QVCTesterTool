@@ -23,24 +23,17 @@ namespace JustForTestConsole
             //watcher.Query = query;
             //watcher.Start();
             //Thread.Sleep(50000000);
+
+            AdbShell adb = new AdbShell();
+            var t = adb.GetDevices();
+            var m = adb.GetDeviceModel(t[0]);
+
+            string lineSeparator = ((char)0x2028).ToString();
+            string paragraphSeparator = ((char)0x2029).ToString();
+
+            string luxm = m.Replace("\r\n", string.Empty).Replace("\n", string.Empty).Replace("\f", string.Empty).Replace("\r", string.Empty).Replace(lineSeparator, string.Empty).Replace(paragraphSeparator, string.Empty);
+            Console.Write(luxm + 88);
             
-
-            //RunApp();
-            //TestWeb();
-            //string input = "all devices are attached\nHJ763764  device\n34djfhJH   device";
-            string input = CmdShell.Execute("adb devices");
-            string pattern = "(\\w+)(\\t)(device)\r\n";
-            Regex regex = new Regex(pattern, RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Compiled);
-            foreach (Match device in regex.Matches(input))
-            {
-                Console.WriteLine(device.Groups[1].Value);
-            }
-
-            //var output = CmdShell.Execute("adb shell \"pm list packages\"");
-            //foreach (var pack in StringHelpers.GetPackagesList(output))
-            //{
-            //    Console.WriteLine(pack);
-            //}
             Console.ReadKey();
         }
 

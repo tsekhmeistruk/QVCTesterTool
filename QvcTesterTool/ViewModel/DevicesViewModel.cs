@@ -8,6 +8,7 @@ using JustForTestConsole;
 using JustForTestConsole.Helpers;
 using JustForTestConsole.Interfaces;
 using System.Management;
+using QvcTesterTool.Model;
 
 namespace QvcTesterTool.ViewModel
 {
