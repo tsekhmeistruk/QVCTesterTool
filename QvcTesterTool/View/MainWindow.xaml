@@ -23,8 +23,14 @@
                 </GridView>          
             </ListView.View>
         </ListView>
-        
-        <Button Content="Update" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="593,36,0,0" Command="{Binding Path = UpdateCommand}"/>
+                <StackPanel HorizontalAlignment="Left" Margin="481,36,0,0" VerticalAlignment="Top">
+            <Button Content="{StaticResource refresh}" Background="White" BorderThickness="0" />
+            <Button Content="{StaticResource camera}" Background="White" BorderThickness="0" />
+
+            <Button Content="{StaticResource power}" Background="White" BorderThickness="0" />
+
+        </StackPanel>
+        <Button Content="Update" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="593,36,0,0" Command="{Binding Path = UpdateCommand}"  Style="{StaticResource MyButtonStyle}" />
 
         <ListView HorizontalAlignment="Left" Height="227" Margin="10,224,0,0" VerticalAlignment="Top" Width="466" ItemsSource="{Binding SelectedDevice.Packages}">
             <ListView.View>
@@ -36,8 +42,6 @@
         </ListView>
         <Button Content="Update" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="907,36,0,0" Command="{Binding Path = SelectedDevice.UpdateCommand}" />
  
-        <StackPanel HorizontalAlignment="Left" Margin="481,36,0,0" VerticalAlignment="Top">
-            <Button Content="{StaticResource camera}" Background="White" BorderThickness="0" ForceCursor="False"></Button>
-        </StackPanel>
+
     </Grid>
 </Window>
