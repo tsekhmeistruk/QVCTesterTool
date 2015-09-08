@@ -13,24 +13,42 @@ namespace QvcTesterTool.Model
 {
     public class Device : INotifyPropertyChanged
     {
+        #region Private Fields
+
         private string _id;
         private string _model;
         private string _osVersion;
         private string _sdkVersion;
         private string _battery;
 
-        private ObservableCollection<string> _packages;
+        private Build _selectedPackage;
 
-        public ObservableCollection<string> Packages 
+        private ObservableCollection<Build> _packages;
+
+        #endregion
+
+        #region Public Properties
+
+        public Build SelectedPackage
+        {
+            get
+            {
+                return _selectedPackage;
+            }
+            set
+            {
+                if (this._selectedPackage == value || value == null) return;
+                _selectedPackage = value;
+            }
+        }
+
+        public ObservableCollection<Build> Packages 
         { 
             get 
             {
                 if (_packages == null)
                 {
-                    _packages = new ObservableCollection<string>() 
-                    { 
-                        "stub1"
-                    };
+                    _packages = new ObservableCollection<Build>();
                 }
                 return _packages;
             }
@@ -104,10 +122,19 @@ namespace QvcTesterTool.Model
             }
         }
 
+        #endregion //Public Properties
+
+        #region Constructor
+
         public Device(string id)
         {
             Initialize(id);
         }
+
+        #endregion
+
+        #region INotifyPropertyChanged Implementation
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         public void OnPropertyChanged(string propertyName)
@@ -119,49 +146,36 @@ namespace QvcTesterTool.Model
             }
         }
 
+        #endregion // INotifyPropertyChanged Implementation
+
+        #region Public Methods
+
         public void UpdatePackagesList()
         {
-            AdbShell adb = new AdbShell();
             Packages.Clear();
-            var packages = adb.GetAllPackagesList(_id);
-            packages.ForEach((p) => Packages.Add(p));
+            var packages = AdbShell.GetAllPackagesList(_id);
+            var qvcPackages = packages.Where((x) => x.Contains("com.qvc") || x.Contains("com.qvcuk") || x.Contains("de.qvc")).ToList();
+            qvcPackages.ForEach((p) => Packages.Add(new Build(p, _id)));
         }
+
+        #endregion //Public Methods
+
+        #region Private Methods
 
         private void Initialize(string id)
         {
              Id = id;
-             Model = GetDeviceModel(id);
-             OsVersion = GetOsVersion(id);
-             SdkVersion = GetSdkVersion(id);
-             Battery = GetBatteryLevel(id);
+             Model = AdbShell.GetDeviceModel(id);
+             OsVersion = AdbShell.GetOsVersion(id);
+             SdkVersion = AdbShell.GetSdkVersion(id);
+             Battery = AdbShell.GetBatteryLevel(id);
         }
 
-        private string GetBatteryLevel(string id)
-        {
-            AdbShell adb = new AdbShell();
-            return adb.GetBatteryLevel(id);
-        }
+        #endregion //Private Methods
 
-        private string GetSdkVersion(string id)
-        {
-            AdbShell adb = new AdbShell();
-            return adb.GetSdkVersion(id);
-        }
-
-        private string GetDeviceModel(string id)
-        {
-            AdbShell adb = new AdbShell();
-            return adb.GetDeviceModel(id);      
-        }
-
-        private string GetOsVersion(string id)
-        {
-            AdbShell adb = new AdbShell();
-            return adb.GetOsVersion(id);
-        }
+        #region Commands
 
         private ICommand _updateCommand;
-
 
         public ICommand UpdateCommand
         {
@@ -181,13 +195,13 @@ namespace QvcTesterTool.Model
         private bool CanUpdate()
         {
             return true;
-            // Verify command can be executed here
         }
 
         private void UpdateObject()
         {
             UpdatePackagesList();
-            // Update command execution logic
         }
+
+        #endregion //Commands
     }
 }

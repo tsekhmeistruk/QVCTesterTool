@@ -24,15 +24,10 @@ namespace JustForTestConsole
             //watcher.Start();
             //Thread.Sleep(50000000);
 
-            AdbShell adb = new AdbShell();
-            var t = adb.GetDevices();
-            var m = adb.GetDeviceModel(t[0]);
+            string f = "eifje__{1}__ifjeifj{0}";
+            string h = String.Format(f, "x2", "x1");
 
-            string lineSeparator = ((char)0x2028).ToString();
-            string paragraphSeparator = ((char)0x2029).ToString();
-
-            string luxm = m.Replace("\r\n", string.Empty).Replace("\n", string.Empty).Replace("\f", string.Empty).Replace("\r", string.Empty).Replace(lineSeparator, string.Empty).Replace(paragraphSeparator, string.Empty);
-            Console.Write(luxm + 88);
+            Console.WriteLine(h);
             
             Console.ReadKey();
         }
@@ -46,31 +41,6 @@ namespace JustForTestConsole
             //WebPageParser.FetchBuild(out build,out buildDate, BuildType.Qa);
             //Console.WriteLine(build);
             //Console.WriteLine(buildDate);
-        }
-
-        private static void RunApp()
-        {
-            var androidSdk = new Adb();
-            while (true)
-            {
-                Console.WriteLine("Download Qa?");
-                Console.ReadKey();
-                androidSdk.DownloadNewBuild(BuildType.Qa);
-
-                Console.WriteLine("Download Stage?");
-                Console.ReadKey();
-                androidSdk.DownloadNewBuild(BuildType.Stage);
-
-                Console.WriteLine("Uninstall All?");
-                Console.ReadKey();
-                androidSdk.UninstallBuild();
-
-                Console.WriteLine("Install Qa?");
-                Console.ReadKey();
-                androidSdk.InstallBuild(BuildType.Qa);
-
-                Console.WriteLine("Complete");
-            }
         }
     }
 }

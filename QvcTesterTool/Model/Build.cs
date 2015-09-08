@@ -9,37 +9,128 @@ namespace QvcTesterTool.Model
 {
     public class Build
     {
-        private string buildCulture;
-        private string buildType;
-        private string buildKind;
-        private string buildNumber;
+        #region Private Fields
+
+        private string _package;
+        private string _buildCulture;
+        private string _buildType;
+        private string _buildKind;
+        private string _buildNumber;
+        private string _activity;
 
         private string _deviceId;
-        public string BuildCulture { get; private set; }
-        public string BuildType { get; private set; }
-        public string BuildKind { get; private set; }
-        public string BuildNumber { get; private set; }
+
+        #endregion
+
+        #region Public Properties
+
+        public string PackageName
+        {
+            get
+            {
+                return _package;
+            }
+
+            private set
+            {
+                _package = value;
+            }
+        }
+
+        public string BuildCulture 
+        {
+            get
+            {
+                return _buildCulture;
+            }
+
+            private set
+            {
+                _buildCulture = value;
+            }
+        }
+
+        public string BuildType
+        {
+            get
+            {
+                return _buildType;
+            }
+
+            private set
+            {
+                _buildType = value;
+            }
+        }
+        public string BuildKind
+        {
+            get
+            {
+                return _buildKind;
+            }
+
+            private set
+            {
+                _buildKind = value;
+            }
+        }
+
+        public string BuildNumber
+        {
+            get
+            {
+                return _buildNumber;
+            }
+
+            private set
+            {
+                _buildNumber = value;
+            }
+        }
+
+        public string Activity
+        {
+            get
+            {
+                return _activity;
+            }
+
+            private set
+            {
+                _activity = value;
+            }
+        }
+
+        #endregion //Public Properties
+
+        #region Constructor
 
         public Build(string packageName, string deviceId)
         {
-            Initialize(packageName, _deviceId);
+            Initialize(packageName, deviceId);
         }
+
+        #endregion //Constructor
+
+        #region Private Methods
 
         private void Initialize(string package, string deviceId)
         {
-            BuildInitializer(package, out buildCulture, out buildType, out buildKind, out buildNumber);
             _deviceId = deviceId;
+            _package = package;
+            BuildInitializer(package);
         }
 
-        private void BuildInitializer(string package, out string buildCulture, out string buildType, out string buildKind, out string buildNumber)
+        private void BuildInitializer(string package)
         {
-            buildCulture = RecognizeCulture(package);
-            buildType = RecognizeBuildType(package);
-            buildKind = RecognizeBuildKind(package);
-            buildNumber = RecognizeBuildNumber(package, _deviceId);
+            _buildCulture = GetBuildCulture(package);
+            _buildType = GetBuildType(package);
+            _buildKind = GetBuildKind(package);
+            _buildNumber = GetBuildNumber(_deviceId, package);
+            _activity = GetActivity(_deviceId, package);
         }
 
-        private string RecognizeCulture(string package)
+        private string GetBuildCulture(string package)
         {
             if (package.Contains("com.qvc."))
             {
@@ -59,15 +150,15 @@ namespace QvcTesterTool.Model
             }
         }
 
-        private string RecognizeBuildType(string package)
+        private string GetBuildType(string package)
         {
             if (package.Contains("qa"))
             {
-                return "QA";
+                return "Qa";
             }
             if (package.Contains("stage"))
             {
-                return "STAGE";
+                return "Stage";
             }
             else
             {
@@ -75,7 +166,7 @@ namespace QvcTesterTool.Model
             }
         }
 
-        private string RecognizeBuildKind(string package)
+        private string GetBuildKind(string package)
         {
             if (package.Contains("ci"))
             {
@@ -83,7 +174,7 @@ namespace QvcTesterTool.Model
             }
             else
             if(package.Contains("tabletopt")){
-                return "TabletOpt";
+                return "-";
             }
             else
             {
@@ -91,10 +182,16 @@ namespace QvcTesterTool.Model
             }
         }
 
-        private string RecognizeBuildNumber(string package, string deviceId)
+        private string GetBuildNumber(string deviceId, string package)
         {
-            AdbShell adb = new AdbShell();
-            return adb.GetBuildNumber(package, deviceId);
+            return AdbShell.GetBuildNumber(deviceId, package);
         }
+
+        private string GetActivity(string deviceId, string package)
+        {
+            return AdbShell.GetActivity(_deviceId, package);
+        }
+
+        #endregion //Private Methods
     }
 }

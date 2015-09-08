@@ -14,19 +14,17 @@ namespace QvcTesterTool.ViewModel
 {
     public class DevicesViewModel
     {
-        private IAdbShell _adb;
         public ObservableCollection<Device> Devices { get; set; }
 
         public DevicesViewModel()
         {
-            _adb = new AdbShell();
             Initialize();
         }
 
         private void Initialize()
         {
             Devices = new ObservableCollection<Device>();
-            foreach (var item in _adb.GetDevices())
+            foreach (var item in AdbShell.GetDevices())
             {
                 Devices.Add(new Device(item));
             }

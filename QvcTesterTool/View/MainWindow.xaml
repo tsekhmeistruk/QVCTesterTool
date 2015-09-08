@@ -32,11 +32,14 @@
         </StackPanel>
         <Button Content="Update" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="593,36,0,0" Command="{Binding Path = UpdateCommand}"  Style="{StaticResource MyButtonStyle}" />
 
-        <ListView HorizontalAlignment="Left" Height="227" Margin="10,224,0,0" VerticalAlignment="Top" Width="466" ItemsSource="{Binding SelectedDevice.Packages}">
+        <ListView SelectedItem="{Binding SelectedDevice.SelectedPackage}" HorizontalAlignment="Left" Height="227" Margin="10,224,0,0" VerticalAlignment="Top" Width="466" ItemsSource="{Binding SelectedDevice.Packages}">
             <ListView.View>
                 <GridView>
-                    <GridViewColumn Header="Packages" DisplayMemberBinding="{Binding}" />
-                    
+                    <GridViewColumn Header="Qa/Stage" DisplayMemberBinding="{Binding BuildType}" />
+                    <GridViewColumn Header="-/Ci" DisplayMemberBinding="{Binding BuildKind}" />
+                    <GridViewColumn Header="Lang" DisplayMemberBinding="{Binding BuildCulture}" />
+                    <GridViewColumn Header="Version" DisplayMemberBinding="{Binding BuildNumber}" />
+                    <GridViewColumn Header="Package" DisplayMemberBinding="{Binding PackageName}" />
                 </GridView>
             </ListView.View>
         </ListView>

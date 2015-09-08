@@ -8,19 +8,19 @@ namespace JustForTestConsole.Builds
 {
     public class QaBuild: BaseQvcBuild
     {
-        public QaBuild(IAdbShell adbShell, Culture culture) : base(adbShell, culture)
+        public QaBuild(Culture culture) : base(culture)
         {
         }
 
         protected override void InstallBuild(string deviceId)
         {
             string path = String.Format("{0}{1}", DataStrings.path, _apk);
-            _adbShell.InstallApk(path, deviceId);
+            AdbShell.InstallApk(path, deviceId);
         }
 
         protected override void UnInstallBuild(string deviceId)
         {
-            _adbShell.UninstallApk(_packageName, deviceId);
+            AdbShell.UninstallApk(_packageName, deviceId);
         }
 
         protected override void DownloadBuild()

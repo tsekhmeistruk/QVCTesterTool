@@ -17,10 +17,15 @@ namespace QvcTesterTool
 {
     public class Core
     {
-        AdbShell adb;
+        #region Private Fields
+
         private Device _selectedDevice;
         private ObservableCollection<Device> _devices;
         private Dispatcher _dispatcher;
+
+        #endregion
+
+        #region Public Properties and Indexers
 
         public Device SelectedDevice
         {
@@ -53,11 +58,6 @@ namespace QvcTesterTool
             }
         }
 
-        public Core()
-        {
-            Initialize();
-        }
-
         public Device this[string index]
         {
             get
@@ -67,12 +67,35 @@ namespace QvcTesterTool
             }
         }
 
+        #endregion
+
+        #region Constructor
+
+        public Core()
+        {
+            Initialize();
+        }
+
+        #endregion
+
+        #region Public Methods
+
+        public void UpdateDevicesList()
+        {
+            Devices.Clear();
+            var devices = AdbShell.GetDevices().Select((id) => new Device(id)).ToList();
+            devices.ForEach((x) => Devices.Add(x));
+        }
+
+        #endregion
+
+        #region Private Methods
+
         private void Initialize()
         {
-            adb = new AdbShell();
             Devices = new ObservableCollection<Device>();
             _dispatcher = Dispatcher.CurrentDispatcher;
-            SetEvent();
+            StartUsbEvent();
             if (Devices.Count > 0)
             {
                 SelectedDevice = Devices[0];
@@ -80,7 +103,7 @@ namespace QvcTesterTool
             }
         }
 
-        private void SetEvent()
+        private void StartUsbEvent()
         {
             using (var watcher = new ManagementEventWatcher())
             {
@@ -99,20 +122,11 @@ namespace QvcTesterTool
             } 
         }
 
-        public void UpdateDevicesList()
-        {
-            Devices.Clear();
-            var devices = adb.GetDevices().Select((id) => new Device(id)).ToList();
-            devices.ForEach((x) => Devices.Add(x));
-        }
+        #endregion
 
-        private void UpdateBuildsList()
-        {
-            
-        }
+        #region Commands
 
         private ICommand _updateCommand;
-
 
         public ICommand UpdateCommand
         {
@@ -132,13 +146,13 @@ namespace QvcTesterTool
         private bool CanUpdate()
         {
             return true;
-            // Verify command can be executed here
         }
 
         private void UpdateObject()
         {
             UpdateDevicesList();
-            // Update command execution logic
         }
+
+        #endregion //Commands
     }
 }

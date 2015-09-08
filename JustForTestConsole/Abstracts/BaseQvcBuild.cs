@@ -20,15 +20,13 @@ namespace JustForTestConsole.Abstracts
         protected string _packageName;
         protected string _activity;
         protected readonly Culture _culture;
-        protected IAdbShell _adbShell;
 
         #endregion
 
         #region Constructors
 
-        protected BaseQvcBuild(IAdbShell adbShell, Culture culture)
+        protected BaseQvcBuild(Culture culture)
         {
-            _adbShell = adbShell;
             _culture = culture;
             Initialize(culture);
         }

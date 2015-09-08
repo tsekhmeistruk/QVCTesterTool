@@ -7,42 +7,44 @@ using System.Text.RegularExpressions;
 
 namespace JustForTestConsole
 {
-    public class AdbShell: IAdbShell
+    public static class AdbShell
     {
-        public string InstallApk(string path, string deviceId)
+        #region Public Methods
+
+        public static string InstallApk(string path, string deviceId)
         {
             string rawCmd = ReplaceMarks(DataStrings.adbInstall, deviceId);
             string cmd = String.Format("{0}{1}", rawCmd, path);
             return CmdExecute(cmd);
         }
 
-        public string UninstallApk(string package, string deviceId)
+        public static string UninstallApk(string package, string deviceId)
         {
             string rawCmd = ReplaceMarks(DataStrings.adbUninstall, deviceId);
             string cmd = String.Format("{0}{1}", rawCmd, package);
             return CmdExecute(cmd);
         }
 
-        public string ForceStopApp(string package, string deviceId)
+        public static string ForceStopApp(string package, string deviceId)
         {
             string rawCmd = ReplaceMarks(DataStrings.adbForceStop, deviceId);
             string cmd = String.Format("{0}{1}", rawCmd, package);
             return CmdExecute(cmd);
         }
 
-        public string ClearDataApp(string package, string deviceId)
+        public static string ClearDataApp(string package, string deviceId)
         {
             string rawCmd = ReplaceMarks(DataStrings.adbClear, deviceId);
             string cmd = String.Format("{0}{1}", rawCmd, package);
             return CmdExecute(cmd);
         }
 
-        public string RunApp(string package, string deviceId, string activity)
+        public static string RunApp(string package, string deviceId, string activity)
         {
             throw new NotImplementedException();
         }
 
-        public List<string> GetDevices()
+        public static List<string> GetDevices()
         {
             List<string> devicesList = new List<string>();
             var devices = CmdShell.Execute(DataStrings.adbDevices);
@@ -54,7 +56,7 @@ namespace JustForTestConsole
             return devicesList;
         }
 
-        public List<string> GetAllPackagesList(string deviceId)
+        public static List<string> GetAllPackagesList(string deviceId)
         {
             string cmd = ReplaceMarks(DataStrings.adbPackages, deviceId);
             var packages = CmdExecute(cmd);
@@ -62,43 +64,43 @@ namespace JustForTestConsole
             return packagesList;
         }
 
-        public List<string> GetPackagesList(string filter, string deviceId)
+        public static List<string> GetPackagesList(string deviceId, string filter)
         {
-            //for qvc package filter should be 'com.qvc'
             string cmd = ReplaceMarks(DataStrings.adbPackagesGrep, deviceId, filter);
             var packages = CmdExecute(cmd);
             List<string> packagesList = StringHelpers.GetPackagesList(packages);
             return packagesList;
         }
 
-        public string GetBuildNumber(string package, string deviceId)
+        public static string GetBuildNumber(string deviceId, string package)
         {
-            string cmd = String.Format("adb -s {1} shell \"dumpsys package {0} | grep versionName\"", package, deviceId);
-            return CmdExecute(cmd);
+            string cmd = String.Format("adb -s {0} shell \"dumpsys package {1} | grep versionName\"", deviceId, package);
+            string output = CmdExecute(cmd);
+            return Regex.Replace(output, "\r|\n|\t|versionName=| ", "");
         }
 
-        public string GetDeviceModel(string deviceId)
+        public static string GetDeviceModel(string deviceId)
         {
             string cmd = String.Format("adb -s {0} shell \"getprop ro.product.model\"", deviceId);
             string output = CmdExecute(cmd);
             return Regex.Replace(output, "\r|\n|\t", "");
         }
 
-        public string GetOsVersion(string deviceId)
+        public static string GetOsVersion(string deviceId)
         {
             string cmd = String.Format("adb -s {0} shell \"getprop ro.build.version.release\"", deviceId);
             string output = CmdExecute(cmd);
             return Regex.Replace(output, "\r|\n|\t", "");
         }
 
-        public string GetSdkVersion(string deviceId)
+        public static string GetSdkVersion(string deviceId)
         {
             string cmd = String.Format("adb -s {0} shell \"getprop ro.build.version.sdk\"", deviceId);
             string output = CmdExecute(cmd);
             return Regex.Replace(output, "\r|\n|\t", "");
         }
 
-        public string GetBatteryLevel(string deviceId)
+        public static string GetBatteryLevel(string deviceId)
         {
             string cmd = String.Format("adb -s {0} shell cat /sys/class/power_supply/battery/*", deviceId);
             string output = CmdExecute(cmd);
@@ -108,25 +110,36 @@ namespace JustForTestConsole
             return Regex.Replace(output, "\r|\n|\t", "");
         }
 
+        public static string GetActivity(string deviceId, string package)
+        {
+            string cmd = String.Format("adb -s {0} shell \"dumpsys package {1} | grep EULA\"", deviceId, package);
+            string output = CmdExecute(cmd);
+            string pattern = "(.*)(/)(.*)(\\s)(\\w+)(\\s)(\\w+)";
+            Regex regex = new Regex(pattern, RegexOptions.Compiled | RegexOptions.Multiline);
+            output = regex.Match(output).Groups[3].Value;
+            return Regex.Replace(output, "\r|\n|\t", "");
+        }
+
+        #endregion //Public Methods
+
         #region Private Methods
 
-        private string CmdExecute(string command)
+        private static string CmdExecute(string command)
         {
             return CmdShell.Execute(command);
         }
 
-        private string ReplaceMarks(string rawCommand, string deviceId)
+        private static string ReplaceMarks(string rawCommand, string deviceId)
         {
             return rawCommand.Replace("*deviceId*", deviceId);
         }
 
-        private string ReplaceMarks(string rawCommand, string deviceId, string filter)
+        private static string ReplaceMarks(string rawCommand, string deviceId, string filter)
         {
             string output = ReplaceMarks(rawCommand, deviceId);
             return output.Replace("*filter*", filter);
         }
 
-        #endregion
-
+        #endregion //Private Methods
     }
 }
