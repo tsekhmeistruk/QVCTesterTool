@@ -1,13 +1,16 @@
 ﻿using JustForTestConsole;
+using QvcTesterTool.Commands;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
 
 namespace QvcTesterTool.Model
 {
-    public class Build
+    public class Build: INotifyPropertyChanged
     {
         #region Private Fields
 
@@ -31,9 +34,10 @@ namespace QvcTesterTool.Model
                 return _package;
             }
 
-            private set
+            set
             {
                 _package = value;
+                OnPropertyChanged("PackageName");
             }
         }
 
@@ -44,9 +48,10 @@ namespace QvcTesterTool.Model
                 return _buildCulture;
             }
 
-            private set
+            set
             {
                 _buildCulture = value;
+                OnPropertyChanged("BuildCulture");
             }
         }
 
@@ -57,11 +62,13 @@ namespace QvcTesterTool.Model
                 return _buildType;
             }
 
-            private set
+            set
             {
                 _buildType = value;
+                OnPropertyChanged("BuildType");
             }
         }
+
         public string BuildKind
         {
             get
@@ -69,9 +76,10 @@ namespace QvcTesterTool.Model
                 return _buildKind;
             }
 
-            private set
+            set
             {
                 _buildKind = value;
+                OnPropertyChanged("BuildKind");
             }
         }
 
@@ -82,9 +90,10 @@ namespace QvcTesterTool.Model
                 return _buildNumber;
             }
 
-            private set
+            set
             {
                 _buildNumber = value;
+                OnPropertyChanged("BuildNumber");
             }
         }
 
@@ -95,9 +104,23 @@ namespace QvcTesterTool.Model
                 return _activity;
             }
 
-            private set
+            set
             {
                 _activity = value;
+                OnPropertyChanged("Activity");
+            }
+        }
+
+        public string DeviceId
+        {
+            get
+            {
+                return _deviceId;
+            }
+
+            set
+            {
+                _deviceId = value;
             }
         }
 
@@ -111,6 +134,10 @@ namespace QvcTesterTool.Model
         }
 
         #endregion //Constructor
+
+        #region Public Methods
+
+        #endregion
 
         #region Private Methods
 
@@ -126,8 +153,8 @@ namespace QvcTesterTool.Model
             _buildCulture = GetBuildCulture(package);
             _buildType = GetBuildType(package);
             _buildKind = GetBuildKind(package);
-            _buildNumber = GetBuildNumber(_deviceId, package);
             _activity = GetActivity(_deviceId, package);
+            _buildNumber = GetBuildNumber(_deviceId, package);
         }
 
         private string GetBuildCulture(string package)
@@ -193,5 +220,26 @@ namespace QvcTesterTool.Model
         }
 
         #endregion //Private Methods
+
+        #region Commands
+
+        
+
+        #endregion
+
+        #region INotifyPropertyChanged Implementation
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public void OnPropertyChanged(string propertyName)
+        {
+            PropertyChangedEventHandler handler = PropertyChanged;
+            if (handler != null)
+            {
+                handler(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
+
+        #endregion // INotifyPropertyChanged Implementation
     }
 }

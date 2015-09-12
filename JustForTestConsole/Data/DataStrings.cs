@@ -3,9 +3,9 @@
     public static class DataStrings
     {
         public const string CULTURE_MARK = "*culture*";
+        public static string activity = "com.qvc.EULA.EulaPage";
 
         public static string path = "d:\\";
-        public static string activity = "com.qvc.EULA.EulaPage";
         public static string pShellDownload = "powershell -command \"& { (New-Object Net.WebClient).DownloadFile('";
         public static string adbInstall = "adb -s *deviceId* install ";
         public static string adbUninstall = "adb -s *deviceId* uninstall ";
@@ -18,8 +18,8 @@
 
         public static string adbModel = "adb -s *deviceId* shell getprop ro.product.model";
 
-        //Web links for downloading:::::: rEPLACE ANOTHER strings in the same way as below
-        public static string linkQa = "https://dl.dropbox.com/u/25719532/apps/android_"+ CULTURE_MARK +"_tabletopt_qa/QVC_" + CULTURE_MARK +"_TabletOpt_QA.apk";
+        
+        public static string linkQa = "https://dl.dropbox.com/u/25719532/apps/android_*culture*_tabletopt_qa/QVC_*culture*_TabletOpt_QA.apk";
 
         public static string linkStage = "https://dl.dropbox.com/u/25719532/apps/android_*culture*_tabletopt_stage/QVC_*culture*_TabletOpt_Stage.apk";
 
@@ -29,6 +29,8 @@
             "https://dl.dropbox.com/u/25719532/apps/android_*culture*_fragment_ci_stage/QVC_*culture*_TabletOpt_CI_Stage.apk";
 
         //Websites
+        public static string webAdress = "https://dl.dropboxusercontent.com/u/25719532/apps/android_*culture*_*kind*_*type*/index.html";
+
         public static string webQa = "https://dl.dropboxusercontent.com/u/25719532/apps/android_*culture*_tabletopt_qa/index.html";
 
         public static string webStage = "https://dl.dropboxusercontent.com/u/25719532/apps/android_*culture*_tabletopt_stage/index.html";
@@ -52,7 +54,7 @@
 
 
         //unsort
-        public static string openApp = "adb -s *deviceId* shell am start -n *package*/*activity*";
+        public static string openApp = "adb -s *deviceId* shell am start -n *package*/" + activity;
         //public static string openApp = "adb -s *deviceId* shell am start -n com.qvc.fragment.ci.stage/com.qvc.EULA.EulaPage";
 
         //Get version of installed

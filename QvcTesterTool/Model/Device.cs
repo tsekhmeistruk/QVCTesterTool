@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using System.Windows.Threading;
 
 namespace QvcTesterTool.Model
 {
@@ -24,6 +25,7 @@ namespace QvcTesterTool.Model
         private Build _selectedPackage;
 
         private ObservableCollection<Build> _packages;
+        Dispatcher _dispatcher;
 
         #endregion
 
@@ -39,12 +41,13 @@ namespace QvcTesterTool.Model
             {
                 if (this._selectedPackage == value || value == null) return;
                 _selectedPackage = value;
+                OnPropertyChanged("SelectedPackage");
             }
         }
 
-        public ObservableCollection<Build> Packages 
-        { 
-            get 
+        public ObservableCollection<Build> Packages
+        {
+            get
             {
                 if (_packages == null)
                 {
@@ -128,7 +131,9 @@ namespace QvcTesterTool.Model
 
         public Device(string id)
         {
-            Initialize(id);
+            _dispatcher = Dispatcher.CurrentDispatcher;
+            _id = id;
+            Task.Run(new Action(Initialize));
         }
 
         #endregion
@@ -152,28 +157,27 @@ namespace QvcTesterTool.Model
 
         public void UpdatePackagesList()
         {
-            Packages.Clear();
+            _dispatcher.Invoke(() => Packages.Clear());
             var packages = AdbShell.GetAllPackagesList(_id);
             var qvcPackages = packages.Where((x) => x.Contains("com.qvc") || x.Contains("com.qvcuk") || x.Contains("de.qvc")).ToList();
-            qvcPackages.ForEach((p) => Packages.Add(new Build(p, _id)));
+            _dispatcher.Invoke(()=>qvcPackages.ForEach((p) => Packages.Add(new Build(p, _id))));
         }
 
         #endregion //Public Methods
 
         #region Private Methods
 
-        private void Initialize(string id)
+        private void Initialize()
         {
-             Id = id;
-             Model = AdbShell.GetDeviceModel(id);
-             OsVersion = AdbShell.GetOsVersion(id);
-             SdkVersion = AdbShell.GetSdkVersion(id);
-             Battery = AdbShell.GetBatteryLevel(id);
+            Model = AdbShell.GetDeviceModel(_id);
+            OsVersion = AdbShell.GetOsVersion(_id);
+            SdkVersion = AdbShell.GetSdkVersion(_id);
+            Battery = AdbShell.GetBatteryLevel(_id);
         }
 
         #endregion //Private Methods
 
-        #region Commands
+        #region Update Command
 
         private ICommand _updateCommand;
 
@@ -202,6 +206,132 @@ namespace QvcTesterTool.Model
             UpdatePackagesList();
         }
 
-        #endregion //Commands
+        #endregion //Update Command
+
+        #region Uninstall Command
+
+        private ICommand _uninstallCommand;
+
+        public ICommand UninstallCommand
+        {
+            get
+            {
+                if (_uninstallCommand == null)
+                {
+                    _uninstallCommand = new RelayCommand(
+                        param => this.UninstallObject(),
+                        param => this.CanUninstall()
+                    );
+                }
+                return _uninstallCommand;
+            }
+        }
+
+        private bool CanUninstall()
+        {
+            return (_selectedPackage != null && !String.IsNullOrEmpty(_selectedPackage.PackageName));
+        }
+
+        private void UninstallObject()
+        {
+            AdbShell.UninstallApk(SelectedPackage.PackageName, SelectedPackage.DeviceId);
+            Packages.Remove(Packages.Where(x => x.PackageName == SelectedPackage.PackageName).FirstOrDefault());
+            SelectedPackage = new Build("", Id);
+        }
+
+        #endregion // Uninstall Command
+
+        #region ClearData Command
+
+        private ICommand _clearCommand;
+
+        public ICommand ClearCommand
+        {
+            get
+            {
+                if (_clearCommand == null)
+                {
+                    _clearCommand = new RelayCommand(
+                        param => this.ClearObject(),
+                        param => this.CanClear()
+                    );
+                }
+                return _clearCommand;
+            }
+        }
+
+        private bool CanClear()
+        {
+            return (_selectedPackage != null && !String.IsNullOrEmpty(_selectedPackage.PackageName));
+        }
+
+        private void ClearObject()
+        {
+            AdbShell.ClearDataApp(SelectedPackage.PackageName, SelectedPackage.DeviceId);
+        }
+
+        #endregion
+
+        #region ForceStop Command
+
+        private ICommand _forceStopCommand;
+
+        public ICommand ForceStopCommand
+        {
+            get
+            {
+                if (_forceStopCommand == null)
+                {
+                    _forceStopCommand = new RelayCommand(
+                        param => this.ForceStopObject(),
+                        param => this.CanForceStop()
+                    );
+                }
+                return _forceStopCommand;
+            }
+        }
+
+        private bool CanForceStop()
+        {
+            return (_selectedPackage != null && !String.IsNullOrEmpty(_selectedPackage.PackageName));
+        }
+
+        private void ForceStopObject()
+        {
+            AdbShell.ForceStopApp(SelectedPackage.PackageName, SelectedPackage.DeviceId);
+        }
+
+        #endregion
+
+        #region Open Command
+
+        private ICommand _openCommand;
+
+        public ICommand OpenCommand
+        {
+            get
+            {
+                if (_openCommand == null)
+                {
+                    _openCommand = new RelayCommand(
+                        param => this.OpenObject(),
+                        param => this.CanOpen()
+                    );
+                }
+                return _openCommand;
+            }
+        }
+
+        private bool CanOpen()
+        {
+            return (_selectedPackage != null && !String.IsNullOrEmpty(_selectedPackage.PackageName));
+        }
+
+        private void OpenObject()
+        {
+            AdbShell.RunApp(SelectedPackage.PackageName, SelectedPackage.DeviceId);
+        }
+
+        #endregion
     }
 }

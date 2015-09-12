@@ -39,9 +39,10 @@ namespace JustForTestConsole
             return CmdExecute(cmd);
         }
 
-        public static string RunApp(string package, string deviceId, string activity)
+        public static string RunApp(string package, string deviceId)
         {
-            throw new NotImplementedException();
+            string cmd = String.Format("adb -s {0} shell am start -n {1}/{2}",deviceId, package, DataStrings.activity);
+            return CmdExecute(cmd);
         }
 
         public static List<string> GetDevices()
@@ -74,9 +75,15 @@ namespace JustForTestConsole
 
         public static string GetBuildNumber(string deviceId, string package)
         {
-            string cmd = String.Format("adb -s {0} shell \"dumpsys package {1} | grep versionName\"", deviceId, package);
+            string cmd = String.Format("adb -s {0} shell \"dumpsys package {1}\"", deviceId, package);
             string output = CmdExecute(cmd);
-            return Regex.Replace(output, "\r|\n|\t|versionName=| ", "");
+
+            string pattern = "(versionName=)(.*)\r\r\n";
+            Regex regex = new Regex(pattern, RegexOptions.Multiline | RegexOptions.Compiled);
+            var versionNumber = regex.Match(output).Groups[2].Value;
+            //TODO Regex for versionName string
+            //versionName=4.0.0.190\r\r\n
+            return versionNumber;
         }
 
         public static string GetDeviceModel(string deviceId)
@@ -118,6 +125,12 @@ namespace JustForTestConsole
             Regex regex = new Regex(pattern, RegexOptions.Compiled | RegexOptions.Multiline);
             output = regex.Match(output).Groups[3].Value;
             return Regex.Replace(output, "\r|\n|\t", "");
+        }
+
+        public static void ResetDevice(string deviceId)
+        {
+            string cmd = String.Format("adb -s {0} reboot", deviceId);
+            var output = CmdExecute(cmd);
         }
 
         #endregion //Public Methods
