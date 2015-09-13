@@ -4,18 +4,18 @@ using JustForTestConsole.Data;
 using JustForTestConsole.Helpers;
 using JustForTestConsole.Interfaces;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace JustForTestConsole
 {
     public static class AdbShell
     {
         #region Public Methods
-
-        public static string InstallApk(string path, string deviceId)
+        public static async Task<string> InstallApkAsync(string path, string deviceId)
         {
             string rawCmd = ReplaceMarks(DataStrings.adbInstall, deviceId);
             string cmd = String.Format("{0}{1}", rawCmd, path);
-            return CmdExecute(cmd);
+            return await CmdExecuteTask(cmd);
         }
 
         public static string UninstallApk(string package, string deviceId)
@@ -137,9 +137,16 @@ namespace JustForTestConsole
 
         #region Private Methods
 
+        private static Task<string> CmdExecuteTask(string command)
+        {
+            return Task<string>.Run(() => CmdShell.Execute(command));
+            
+        }
+
         private static string CmdExecute(string command)
         {
             return CmdShell.Execute(command);
+
         }
 
         private static string ReplaceMarks(string rawCommand, string deviceId)

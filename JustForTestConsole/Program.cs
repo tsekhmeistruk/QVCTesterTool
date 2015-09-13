@@ -34,14 +34,17 @@ namespace JustForTestConsole
                 //var watcher = new ManagementEventWatcher(query);
                 //watcher.EventArrived += new EventArrivedEventHandler((x, y) => Console.WriteLine("USB"));
                 //watcher.Start();
-            string build;
-            string date;
-            string webadress = DataStrings.webStage.Replace("*culture*", "us");
 
-            WebPageParser.FetchBuild(out build, out date, webadress);
-            Console.WriteLine("Biuld: {0} \nDate: {1}", build, date);
-            
-            
+            DateTimeConverter g = new DateTimeConverter();
+
+            var t2 = DateTime.Parse("Friday September 11, 2015 11:18AM");
+            var t = DateTime.Parse("Thursday August 20, 2015 11:36AM");
+            var result = t.Subtract(t2);
+
+            Console.WriteLine(t);
+            var t1 = t.AddHours(7);
+            Console.WriteLine(t1);
+            Console.WriteLine(result);
             Console.ReadKey();
         }
 

@@ -19,7 +19,10 @@ namespace QvcTesterTool.Model
         #region Private Fields
 
         private string _build;
-        private string _buildDate;
+        private string _buildDateNy;
+        private string _buildDateLocal;
+        private string _elapsedTime;
+
         private string _buildNumber;
         private bool _isAvailable;
         private string _webAdress;
@@ -33,16 +36,42 @@ namespace QvcTesterTool.Model
 
         #region Public Properties
 
-        public string BuildDate
+        public string BuildDateNY
         {
             get
             {
-                return _buildDate;
+                return _buildDateNy;
             }
             set
             {
-                _buildDate = value;
-                OnPropertyChanged("BuildDate");
+                _buildDateNy = value;
+                OnPropertyChanged("BuildDateNY");
+            }
+        }
+
+        public string BuildDateLocal
+        {
+            get
+            {
+                return _buildDateLocal;
+            }
+            set
+            {
+                _buildDateLocal = value;
+                OnPropertyChanged("BuildDateLocal");
+            }
+        }
+
+        public string ElapsedTime
+        {
+            get
+            {
+                return _elapsedTime;
+            }
+            set
+            {
+                _elapsedTime = value;
+                OnPropertyChanged("ElapsedTime");
             }
         }
 
@@ -119,49 +148,91 @@ namespace QvcTesterTool.Model
                 catch
                 {
                     IsAvailable = false;
-                    BuildDate = "-";
+                    BuildDateNY = "-";
                     BuildNumber = "-";
                     return "-";
                 }
             }
-        } 
+        }
 
-        #endregion //Private Methods
+        private string GetNyDate()
+        {
+            try
+            {
+                return DateTime.Parse(GetBuildDate()).ToString();        
 
-        #region Public Methods
+            }
+            catch
+            {
+                return "-";
+            }
+        }
 
-        public string GetBuildNumber()
+        private string GetLocalDate()
+        {
+            try
+            {
+                return DateTime.Parse(GetBuildDate()).AddHours(7).ToString();
+            }
+            catch
+            {
+                return "-";
+            }
+        }
+
+        private string GetElapsedTime()
+        {
+            try
+            {
+                TimeSpan time = DateTime.Now.Subtract(DateTime.Parse(GetLocalDate()));
+                var days = time.Days;
+                var hours = time.Hours;
+                var minutes = time.Minutes;
+
+                return String.Format("{0}d {1}h {2}m", days, hours, minutes);
+            }
+            catch
+            {
+                return "-";
+            }
+        }
+
+        private string GetBuildNumber()
         {
             string pattern = "(<br />Build )[^\\d]*(\\d+)\\s";
             Regex regex = new Regex(pattern);
             return regex.Match(_sourceCode).Groups[2].Value;
         }
 
-        public string GetBuildDate()
+        private string GetBuildDate()
         {
             string pattern = "(<p>Build Date: )(.*)</p>";
             Regex regex = new Regex(pattern);
             return regex.Match(_sourceCode).Groups[2].Value;
         }
 
-        public string GetBuild()
+        private string GetBuild()
         {
             return String.Format("{0}_{1}_{2}", _culture, _buildType, _buildKind);
         }
 
-        public void CheckWebBuild()
+        private void CheckWebBuild()
         {
             IsAvailable = true;
             _sourceCode = GetSourceCode(_webAdress);
+            
             Build = GetBuild();
+            BuildDateNY = GetNyDate();
+            BuildDateLocal = GetLocalDate();
+            ElapsedTime = GetElapsedTime();
             if (IsAvailable)
             {
                 BuildNumber = GetBuildNumber();
-                BuildDate = GetBuildDate();
+                
             }
         } 
 
-        #endregion //Public Methods
+        #endregion //Private Methods
 
         #region INotifyPropertyChanged Implementation
 

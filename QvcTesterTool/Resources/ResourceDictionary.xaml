@@ -33,7 +33,7 @@
         <Setter Property="Background" Value="{StaticResource DefaultBrush}" />
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="BorderBrush" Value="Black" />
-        <Setter Property="Padding" Value="8" />
+        <Setter Property="Padding" Value="6" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
@@ -65,7 +65,7 @@
 
 
     <Style x:Key="GridViewColumnHeaderStyle" TargetType="{x:Type GridViewColumnHeader}">
-        <Setter Property="IsEnabled" Value="True"/>
+        <Setter Property="IsEnabled" Value="False"/>
         <Setter Property="HorizontalContentAlignment" Value="Left" />
     </Style>
     

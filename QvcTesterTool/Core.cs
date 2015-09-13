@@ -72,6 +72,7 @@ namespace QvcTesterTool
                 //}
                 return _webBuilds;
             }
+
             private set
             {
                 _webBuilds = value;
@@ -266,9 +267,9 @@ namespace QvcTesterTool
             AdbShell.ResetDevice(_selectedDevice.Id);
         }
 
-        public void InstallApk(string path)
+        public async void InstallApk(string path)
         {
-            AdbShell.InstallApk(path, _selectedDevice.Id);
+            await AdbShell.InstallApkAsync(path, _selectedDevice.Id);
             _selectedDevice.UpdatePackagesList();
         }
         #endregion //Commands

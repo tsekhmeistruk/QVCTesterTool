@@ -161,6 +161,7 @@ namespace QvcTesterTool.Model
             var packages = AdbShell.GetAllPackagesList(_id);
             var qvcPackages = packages.Where((x) => x.Contains("com.qvc") || x.Contains("com.qvcuk") || x.Contains("de.qvc")).ToList();
             _dispatcher.Invoke(()=>qvcPackages.ForEach((p) => Packages.Add(new Build(p, _id))));
+            SelectedPackage = new Build(String.Empty, String.Empty);
         }
 
         #endregion //Public Methods

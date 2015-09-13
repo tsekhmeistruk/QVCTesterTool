@@ -16,6 +16,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace QvcTesterTool.View
 {
@@ -24,6 +25,7 @@ namespace QvcTesterTool.View
     /// </summary>
     public partial class MainWindow : Window
     {
+        Dispatcher _dispatcher;
         public ObservableCollection<string> Files
         {
             get
@@ -38,6 +40,7 @@ namespace QvcTesterTool.View
         {
           //  InitializeComponent();
             DataContext = new Core();
+            _dispatcher = Dispatcher.CurrentDispatcher;
         }
 
         private void DropBox_DragOver(object sender, DragEventArgs e)
@@ -71,8 +74,9 @@ namespace QvcTesterTool.View
                 {
                     _files.Add(filePath);
                 }
-
                 UploadFiles(files);
+
+                
             }
 
             var listbox = sender as ListBox;
@@ -89,7 +93,7 @@ namespace QvcTesterTool.View
             OpenFileDialog dialog = new OpenFileDialog();
             dialog.Filter = "Apk Files (*.apk)|*.apk";
             dialog.FilterIndex = 1;
-            dialog.Multiselect = true;
+            dialog.Multiselect = false;
 
             Nullable<bool> result = dialog.ShowDialog();
 

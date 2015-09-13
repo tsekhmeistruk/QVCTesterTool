@@ -12,10 +12,10 @@ namespace JustForTestConsole.Builds
         {
         }
 
-        protected override void InstallBuild(string deviceId)
+        protected override async void InstallBuild(string deviceId)
         {
             string path = String.Format("{0}{1}", DataStrings.path, _apk);
-            AdbShell.InstallApk(path, deviceId);
+            await AdbShell.InstallApkAsync(path, deviceId);
         }
 
         protected override void UnInstallBuild(string deviceId)
