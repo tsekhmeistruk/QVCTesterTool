@@ -18,12 +18,18 @@
 
         public static string adbModel = "adb -s *deviceId* shell getprop ro.product.model";
 
-        
-        public static string linkQa = "https://dl.dropbox.com/u/25719532/apps/android_*culture*_tabletopt_qa/QVC_*culture*_TabletOpt_QA.apk";
 
-        public static string linkStage = "https://dl.dropbox.com/u/25719532/apps/android_*culture*_tabletopt_stage/QVC_*culture*_TabletOpt_Stage.apk";
+        public static string link = "https://dl.dropbox.com/u/25719532/apps/android_*culture*_tabletopt_qa/QVC_*culture*_TabletOpt_QA.apk";
 
-        public static string linkCiQa = "https://dl.dropbox.com/u/25719532/apps/android_*culture*_fragment_ci_qa/QVC_*culture*_TabletOpt_CI_QA.apk";
+
+        public static string linkQa = 
+            "https://dl.dropbox.com/u/25719532/apps/android_*culture*_tabletopt_qa/QVC_*culture*_TabletOpt_QA.apk";
+
+        public static string linkStage = 
+            "https://dl.dropbox.com/u/25719532/apps/android_*culture*_tabletopt_stage/QVC_*culture*_TabletOpt_Stage.apk";
+
+        public static string linkCiQa = 
+            "https://dl.dropbox.com/u/25719532/apps/android_*culture*_fragment_ci_qa/QVC_*culture*_TabletOpt_CI_QA.apk";
 
         public static string linkCiStage =
             "https://dl.dropbox.com/u/25719532/apps/android_*culture*_fragment_ci_stage/QVC_*culture*_TabletOpt_CI_Stage.apk";

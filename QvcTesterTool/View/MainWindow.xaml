@@ -141,7 +141,7 @@
             <Label Content="&#9729; QVC Android builds on dl.dropboxusercontent.com website"></Label>
 
             <DockPanel Name="WebBuilds">
-                <ListView SelectionMode="Single" ItemsSource="{Binding FirstResultDataView}" >
+                <ListView SelectedItem="{Binding SelectedWebBuild}" SelectionMode="Single" ItemsSource="{Binding FirstResultDataView}" >
                 <ListView.View>
                     <GridView>
                         <GridViewColumn Width="130" DisplayMemberBinding="{Binding Build}">
@@ -187,7 +187,7 @@
                     </DockPanel>
                 </Button>
 
-                    <Button Command="{Binding ResetCommand}">
+                    <Button Command="{Binding DownloadCommand}" CommandParameter="{Binding SelectedWebBuild.Build}">
                         <DockPanel>
                             <TextBlock Width="15">&#8681;</TextBlock>
                             <TextBlock>Download</TextBlock>

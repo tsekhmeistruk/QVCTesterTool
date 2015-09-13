@@ -5,6 +5,7 @@ using JustForTestConsole.Helpers;
 using JustForTestConsole.Interfaces;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Net;
 
 namespace JustForTestConsole
 {
@@ -131,6 +132,22 @@ namespace JustForTestConsole
         {
             string cmd = String.Format("adb -s {0} reboot", deviceId);
             var output = CmdExecute(cmd);
+        }
+
+        public static void DownloadApk(string link, string path)
+        {
+            try
+            {
+                using (WebClient client = new WebClient())
+                {
+                    client.DownloadFile(link, path);
+                }
+            }
+            catch
+            {
+                return;
+            }
+
         }
 
         #endregion //Public Methods

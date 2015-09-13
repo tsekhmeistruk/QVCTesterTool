@@ -1,4 +1,6 @@
 ﻿using JustForTestConsole;
+using JustForTestConsole.Data;
+using Microsoft.Win32;
 using QvcTesterTool.Commands;
 using QvcTesterTool.Model;
 using System;
@@ -8,6 +10,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Management;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -22,6 +25,7 @@ namespace QvcTesterTool
         #region Private Fields
 
         private Device _selectedDevice;
+        private WebBuild _selectedWebBuild;
         private ObservableCollection<Device> _devices;
         private ObservableCollection<WebBuild> _webBuilds;
         private Dispatcher _dispatcher;
@@ -81,6 +85,19 @@ namespace QvcTesterTool
             }
         }
 
+        public WebBuild SelectedWebBuild
+        {
+            get
+            {
+                return _selectedWebBuild;
+            }
+            set
+            {
+                if (this._selectedWebBuild == value || value == null) return;
+                _selectedWebBuild = value;
+            }
+        }
+
         #endregion
 
         #region Constructor
@@ -133,7 +150,7 @@ namespace QvcTesterTool
                 Devices.Clear();
                 result.ForEach((x) => Devices.Add(x));
 
-                if (SelectedDevice != null && !result.Any(c => c.Id == SelectedDevice.Id))
+                if (SelectedDevice != null && !result.Any(c => c.Id == SelectedDevice.Id) && Devices.Count > 0)
                 {
                     SelectedDevice = Devices[0];
                 }
@@ -236,7 +253,7 @@ namespace QvcTesterTool
             UpdateDevicesList();
         }
 
-        #endregion //Commands
+        #endregion //Update Command
 
         #region Reset Command
 
@@ -272,7 +289,77 @@ namespace QvcTesterTool
             await AdbShell.InstallApkAsync(path, _selectedDevice.Id);
             _selectedDevice.UpdatePackagesList();
         }
-        #endregion //Commands
+        #endregion //Reset Command
+
+        #region Reset Command
+
+        private ICommand _downloadCommand;
+
+        public ICommand DownloadCommand
+        {
+            get
+            {
+                if (_downloadCommand == null)
+                {
+                    _downloadCommand = new RelayCommand(
+                        DownloadObject,
+                        param => this.CanDownload()
+                    );
+                }
+                return _downloadCommand;
+            }
+        }
+
+        private bool CanDownload()
+        {
+            return (_selectedWebBuild != null && (SelectedWebBuild.BuildNumber != "-"));
+        }
+
+        private void DownloadObject(object build)
+        {
+            string downloadLink;
+            string addressLink = "https://dl.dropbox.com/u/25719532/apps/android_{0}_{2}_{1}/QVC_{0}_{3}{4}_{1}.apk";
+            string buildParameters = build as string;
+            string[] parameters = buildParameters.Split('_');
+
+     
+            string extraBuildKind = "TabletOpt";
+            if (parameters.Length == 4)
+            {
+                if (parameters[0] == "uk") extraBuildKind = "Fragment_";
+                downloadLink = String.Format(addressLink, parameters[0], parameters[1], "fragment_ci", extraBuildKind, "_ci");
+            }
+            else
+            if (parameters.Length == 3)
+            {
+                downloadLink = String.Format(addressLink, parameters[0], parameters[1], "tabletopt", extraBuildKind, "");
+            }
+
+            else
+            {
+                return;
+            }
+
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+
+            string pattern = "(/.*/.*/.*/.*/.*/.*/)(.*)";
+            Regex regex = new Regex(pattern);
+            string filename = regex.Match(downloadLink).Groups[2].Value;
+
+            saveFileDialog.FileName = filename;
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                string path = saveFileDialog.FileName;
+                AdbShell.DownloadApk(downloadLink, path);
+            }         
+        }
+
+        public async void DownloadApk(string path)
+        {
+            await AdbShell.InstallApkAsync(path, _selectedDevice.Id);
+            _selectedDevice.UpdatePackagesList();
+        }
+        #endregion //Download Command
 
         #region Sorting
 
