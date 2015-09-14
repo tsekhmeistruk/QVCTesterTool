@@ -62,7 +62,13 @@
 
             <DockPanel Name="Builds">
 
-                <ListView Width="173" AllowDrop="True" Drop="DropBox_Drop" DragOver="DropBox_DragOver" DragLeave="DropBox_DragLeave" ItemsSource="{Binding Path=Files}">
+                <ListView Width="173" AllowDrop="True" Drop="DropBox_Drop" DragOver="DropBox_DragOver" DragLeave="DropBox_DragLeave" ItemsSource="{Binding Path=Files}" >
+                   
+                    <!--Should be changed-->
+                    <ListView.InputBindings>
+                    <MouseBinding Gesture="LeftDoubleClick" Command="{Binding UpdateWebBuildsCommand}"/>
+                    </ListView.InputBindings>
+
                     <ListView.Background>
                         <ImageBrush Stretch="Fill" ImageSource="..\Resources\Pngs\androidapk.png" />
                     </ListView.Background>
