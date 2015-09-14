@@ -180,7 +180,7 @@
             </ListView>
 
             <StackPanel>
-                <Button Command="{Binding UpdateCommand}">
+                <Button Command="{Binding UpdateWebBuildsCommand}">
                     <DockPanel>
                         <TextBlock Width="15">&#10226;</TextBlock>
                         <TextBlock>Refresh</TextBlock>

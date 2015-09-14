@@ -192,17 +192,6 @@ namespace QvcTesterTool
 
         }
 
-        private void UpdateWebBuilds()
-        {
-            string[] buildTypes = { "qa", "stage" };
-            string[] buildKinds = { "tabletopt", "fragment_ci" };
-            string[] buildCultures = { "us", "uk", "de" };
-
-            Array.ForEach(buildCultures, c => Array.ForEach(buildTypes, t =>
-                                           Array.ForEach(buildKinds, k =>
-                                           WebBuilds.Add(new WebBuild(c, t, k)))));
-        }
-
         private void StartUsbEvent()
         {
             using (var watcher = new ManagementEventWatcher())
@@ -223,6 +212,44 @@ namespace QvcTesterTool
         }
 
         #endregion
+
+        #region Update WebBuilds Command
+
+        private ICommand _updateWebBuildsCommand;
+
+        public ICommand UpdateWebBuildsCommand
+        {
+            get
+            {
+                if (_updateWebBuildsCommand == null)
+                {
+                    _updateWebBuildsCommand = new RelayCommand(
+                        param => this.UpdateWebBuilds(),
+                        param => this.CanUpdateWebBuilds()
+                    );
+                }
+                return _updateWebBuildsCommand;
+            }
+        }
+
+        private bool CanUpdateWebBuilds()
+        {
+            return true;
+        }
+
+        private void UpdateWebBuilds()
+        {
+            WebBuilds.Clear();
+            string[] buildTypes = { "qa", "stage" };
+            string[] buildKinds = { "tabletopt", "fragment_ci" };
+            string[] buildCultures = { "us", "uk", "de" };
+
+            Array.ForEach(buildCultures, c => Array.ForEach(buildTypes, t =>
+                                           Array.ForEach(buildKinds, k =>
+                                           WebBuilds.Add(new WebBuild(c, t, k)))));
+        }
+
+        #endregion //Update Command
 
         #region Update Command
 
@@ -291,7 +318,7 @@ namespace QvcTesterTool
         }
         #endregion //Reset Command
 
-        #region Reset Command
+        #region Download Command
 
         private ICommand _downloadCommand;
 
