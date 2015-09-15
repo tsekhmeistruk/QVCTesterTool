@@ -386,6 +386,7 @@ namespace QvcTesterTool
             await AdbShell.InstallApkAsync(path, _selectedDevice.Id);
             _selectedDevice.UpdatePackagesList();
         }
+
         #endregion //Download Command
 
         #region Sorting

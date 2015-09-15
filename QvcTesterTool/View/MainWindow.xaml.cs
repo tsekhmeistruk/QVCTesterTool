@@ -41,6 +41,7 @@ namespace QvcTesterTool.View
           //  InitializeComponent();
             DataContext = new Core();
             _dispatcher = Dispatcher.CurrentDispatcher;
+           
         }
 
         private void DropBox_DragOver(object sender, DragEventArgs e)

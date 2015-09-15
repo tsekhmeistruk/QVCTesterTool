@@ -157,9 +157,6 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\Pngs\draganddrop.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Resources\Pngs\androidapk.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>

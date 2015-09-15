@@ -8,7 +8,7 @@ using System.Windows.Input;
 
 namespace QvcTesterTool.Commands
 {
-    public class RelayCommand : ICommand
+    public class RelayComm  and : ICommand
     {
         #region Fields
 

@@ -147,7 +147,7 @@
             <Label Content="&#9729; QVC Android builds on dl.dropboxusercontent.com website"></Label>
 
             <DockPanel Name="WebBuilds">
-                <ListView SelectedItem="{Binding SelectedWebBuild}" SelectionMode="Single" ItemsSource="{Binding FirstResultDataView}" >
+                <ListView ItemContainerStyle="{StaticResource alternatingStyle}" AlternationCount="2" SelectedItem="{Binding SelectedWebBuild}" SelectionMode="Single" ItemsSource="{Binding FirstResultDataView}" >
                 <ListView.View>
                     <GridView>
                         <GridViewColumn Width="130" DisplayMemberBinding="{Binding Build}">
