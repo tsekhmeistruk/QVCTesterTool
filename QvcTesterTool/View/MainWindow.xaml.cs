@@ -89,7 +89,7 @@ namespace QvcTesterTool.View
             ((Core)DataContext).InstallApk(files[0]);   
         }
 
-        private void InstallButton_Click(object sender, RoutedEventArgs e)
+        public void InstallButton_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog dialog = new OpenFileDialog();
             dialog.Filter = "Apk Files (*.apk)|*.apk";

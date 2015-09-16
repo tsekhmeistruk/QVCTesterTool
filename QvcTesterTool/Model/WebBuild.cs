@@ -247,8 +247,6 @@ namespace QvcTesterTool.Model
             }
         }
 
-        #endregion //INotifyPropertyChanged Implementation
-
-        
+        #endregion //INotifyPropertyChanged Implementation        
     }
 }

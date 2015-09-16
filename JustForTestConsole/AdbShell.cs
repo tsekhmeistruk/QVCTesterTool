@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using JustForTestConsole.Data;
 using JustForTestConsole.Helpers;
 using JustForTestConsole.Interfaces;
@@ -82,8 +83,6 @@ namespace JustForTestConsole
             string pattern = "(versionName=)(.*)\r\r\n";
             Regex regex = new Regex(pattern, RegexOptions.Multiline | RegexOptions.Compiled);
             var versionNumber = regex.Match(output).Groups[2].Value;
-            //TODO Regex for versionName string
-            //versionName=4.0.0.190\r\r\n
             return versionNumber;
         }
 
@@ -132,22 +131,6 @@ namespace JustForTestConsole
         {
             string cmd = String.Format("adb -s {0} reboot", deviceId);
             var output = CmdExecute(cmd);
-        }
-
-        public static void DownloadApk(string link, string path)
-        {
-            try
-            {
-                using (WebClient client = new WebClient())
-                {
-                    client.DownloadFile(link, path);
-                }
-            }
-            catch
-            {
-                return;
-            }
-
         }
 
         #endregion //Public Methods

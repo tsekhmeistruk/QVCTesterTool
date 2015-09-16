@@ -1,5 +1,9 @@
-﻿using JustForTestConsole;
-using JustForTestConsole.Data;
+﻿using System.Net;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls.Primitives;
+using JustForTestConsole;
 using Microsoft.Win32;
 using QvcTesterTool.Commands;
 using QvcTesterTool.Model;
@@ -9,14 +13,11 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Management;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Threading;
+using QvcTesterTool.ViewModel;
 
 namespace QvcTesterTool
 {
@@ -29,6 +30,7 @@ namespace QvcTesterTool
         private ObservableCollection<Device> _devices;
         private ObservableCollection<WebBuild> _webBuilds;
         private Dispatcher _dispatcher;
+        private StatusBarViewModel _statusBar;
 
         #endregion
 
@@ -95,6 +97,18 @@ namespace QvcTesterTool
             {
                 if (this._selectedWebBuild == value || value == null) return;
                 _selectedWebBuild = value;
+            }
+        }
+
+        public StatusBarViewModel StatusBar
+        {
+            get
+            {
+                return _statusBar;
+            }
+            set
+            {
+                _statusBar = value;
             }
         }
 
@@ -175,6 +189,7 @@ namespace QvcTesterTool
         {
             Devices = new ObservableCollection<Device>();
             WebBuilds = new ObservableCollection<WebBuild>();
+            _statusBar = new StatusBarViewModel();
 
             UpdateWebBuilds();
 
@@ -311,11 +326,6 @@ namespace QvcTesterTool
             AdbShell.ResetDevice(_selectedDevice.Id);
         }
 
-        public async void InstallApk(string path)
-        {
-            await AdbShell.InstallApkAsync(path, _selectedDevice.Id);
-            _selectedDevice.UpdatePackagesList();
-        }
         #endregion //Reset Command
 
         #region Download Command
@@ -377,15 +387,52 @@ namespace QvcTesterTool
             if (saveFileDialog.ShowDialog() == true)
             {
                 string path = saveFileDialog.FileName;
-                AdbShell.DownloadApk(downloadLink, path);
+                StatusBar.DownloadStatusBar = "Downloading file...";
+                DownloadFile(downloadLink, path);
             }         
         }
 
-        public async void DownloadApk(string path)
+        public void DownloadFile(string link, string path)
         {
-            await AdbShell.InstallApkAsync(path, _selectedDevice.Id);
-            _selectedDevice.UpdatePackagesList();
+            try
+            {
+                Task.Run(() =>
+                {
+                    using (var client = new WebClient())
+                    {
+                        client.DownloadFileAsync(new Uri(link), path);
+                        client.DownloadFileCompleted += new AsyncCompletedEventHandler(DownloadFileCompleted);
+                    }
+                });
+
+            }
+            catch
+            {
+                return;
+            }
+
         }
+
+        private void DownloadFileCompleted(object sender, AsyncCompletedEventArgs e)
+        {
+            _dispatcher.Invoke(()=>
+            {
+                StatusBar.DownloadStatusBar = "Downloading Complete.";
+                StatusBarChangedAsync();
+            });
+        }
+
+        private async void StatusBarChangedAsync()
+        {
+            await Task.Delay(5000);
+            StatusBar.DownloadStatusBar = "";
+        }
+
+        //public async void InstallApk(string path)
+        //{
+        //    await AdbShell.InstallApkAsync(path, _selectedDevice.Id);
+        //    _selectedDevice.UpdatePackagesList();
+        //}
 
         #endregion //Download Command
 
@@ -438,5 +485,26 @@ namespace QvcTesterTool
         }
 
         #endregion //Sorting
+
+        #region INotifyPropertyChanged Implementation
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public void OnPropertyChanged(string propertyName)
+        {
+            PropertyChangedEventHandler handler = PropertyChanged;
+            if (handler != null)
+            {
+                handler(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
+
+        #endregion // INotifyPropertyChanged Implementation
+
+        public async void InstallApk(string path)
+        {
+            await AdbShell.InstallApkAsync(path, _selectedDevice.Id);
+            _selectedDevice.UpdatePackagesList();
+        }
     }
 }

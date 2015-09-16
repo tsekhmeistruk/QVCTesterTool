@@ -61,12 +61,12 @@
             <Label Content="&#128230; Installed Qvc apps" />
 
             <DockPanel Name="Builds">
-
+                
                 <ListView Width="173" AllowDrop="True" Drop="DropBox_Drop" DragOver="DropBox_DragOver" DragLeave="DropBox_DragLeave" ItemsSource="{Binding Path=Files}" >
                    
                     <!--Should be changed-->
                     <ListView.InputBindings>
-                    <MouseBinding Gesture="LeftDoubleClick" Command="{Binding UpdateWebBuildsCommand}"/>
+                        <MouseBinding Gesture="" Command="{Binding UpdateWebBuildsCommand}"/>
                     </ListView.InputBindings>
 
                     <ListView.Background>
@@ -147,6 +147,13 @@
             <Label Content="&#9729; QVC Android builds on dl.dropboxusercontent.com website"></Label>
 
             <DockPanel Name="WebBuilds">
+
+                <StatusBar DockPanel.Dock="Bottom">
+                    <StatusBarItem>
+                        <TextBlock Text="{Binding StatusBar.DownloadStatusBar}"/>
+                    </StatusBarItem>
+                </StatusBar>
+                
                 <ListView ItemContainerStyle="{StaticResource alternatingStyle}" AlternationCount="2" SelectedItem="{Binding SelectedWebBuild}" SelectionMode="Single" ItemsSource="{Binding FirstResultDataView}" >
                 <ListView.View>
                     <GridView>
