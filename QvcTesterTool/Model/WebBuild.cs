@@ -1,5 +1,4 @@
-﻿using JustForTestConsole.Data;
-using QvcTesterTool.Commands;
+﻿using QvcTesterTool.Commands;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -11,6 +10,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Data;
 using System.Windows.Input;
+using QvcTesterTool.Data;
 
 namespace QvcTesterTool.Model
 {

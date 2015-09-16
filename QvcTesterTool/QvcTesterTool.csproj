@@ -49,8 +49,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>
-    </ApplicationIcon>
+    <ApplicationIcon>Resources\Icon\qvc.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject>QvcTesterTool.App</StartupObject>
@@ -90,8 +89,13 @@
     </Compile>
     <Compile Include="Commands\RalayCommand.cs" />
     <Compile Include="Core.cs" />
+    <Compile Include="Data\DataStrings.cs" />
+    <Compile Include="Helpers\AdbShell.cs" />
+    <Compile Include="Helpers\CmdShell.cs" />
+    <Compile Include="Helpers\StringHelpers.cs" />
     <Compile Include="Model\Build.cs" />
     <Compile Include="Model\Device.cs" />
+    <Compile Include="Model\LogButton.cs" />
     <Compile Include="Model\WebBuild.cs" />
     <Compile Include="ViewModel\StatusBarViewModel.cs" />
     <Compile Include="View\MainWindow.xaml.cs">
@@ -128,13 +132,15 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\JustForTestConsole\JustForTestConsole.csproj">
-      <Project>{10add361-d87f-4ad4-bbfb-0048266f135b}</Project>
-      <Name>JustForTestConsole</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Helpers\" />
+    <Content Include="adb.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="AdbWinApi.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="AdbWinUsbApi.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5">
@@ -164,6 +170,7 @@
   <ItemGroup>
     <Resource Include="Resources\Icon\icon.ico" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

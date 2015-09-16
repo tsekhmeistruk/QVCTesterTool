@@ -1,11 +1,9 @@
-﻿using System.Net;
-using System.Threading;
+﻿using System.Globalization;
+using System.Net;
 using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls.Primitives;
-using JustForTestConsole;
 using Microsoft.Win32;
 using QvcTesterTool.Commands;
+using QvcTesterTool.Data;
 using QvcTesterTool.Model;
 using System;
 using System.Collections.Generic;
@@ -18,6 +16,7 @@ using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Threading;
 using QvcTesterTool.ViewModel;
+using QvcTesterTool.Helpers;
 
 namespace QvcTesterTool
 {
@@ -31,6 +30,7 @@ namespace QvcTesterTool
         private ObservableCollection<WebBuild> _webBuilds;
         private Dispatcher _dispatcher;
         private StatusBarViewModel _statusBar;
+        private LogButton _logButton;
 
         #endregion
 
@@ -112,6 +112,18 @@ namespace QvcTesterTool
             }
         }
 
+        public LogButton LogButton
+        {
+            get
+            {
+                return _logButton;
+            }
+            set
+            {
+                _logButton = value;
+            }
+        }
+
         #endregion
 
         #region Constructor
@@ -190,6 +202,7 @@ namespace QvcTesterTool
             Devices = new ObservableCollection<Device>();
             WebBuilds = new ObservableCollection<WebBuild>();
             _statusBar = new StatusBarViewModel();
+            _logButton = new LogButton(){Text = "Start log"};
 
             UpdateWebBuilds();
 
@@ -328,6 +341,106 @@ namespace QvcTesterTool
 
         #endregion //Reset Command
 
+        #region Log Command
+
+        private ICommand _logCommand;
+
+        public ICommand LogCommand
+        {
+            get
+            {
+                if (_logCommand == null)
+                {
+                    _logCommand = new RelayCommand(
+                        param => this.StartLog()
+                    );
+                }
+
+                if (_logButton.Text == "Start log")
+                {
+                    _logCommand = new RelayCommand(
+                        param => this.StartLog()
+                        );
+                }
+
+                if (_logButton.Text == "Stop log")
+                {
+                    _logCommand = new RelayCommand(
+                        param => this.StopLog()
+                    );
+                }
+                return _logCommand;
+            }
+        }
+
+ 
+
+        private void StartLog()
+        {
+            AdbShell.StartLog(_selectedDevice.Id);
+        }
+
+        private void StopLog()
+        {
+
+
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+
+            saveFileDialog.FileName = DateTime.Now.ToString(CultureInfo.InvariantCulture) + ".txt";
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                string path = saveFileDialog.FileName;
+                //StatusBar.DeviceStatusBar = "Downloading file...";
+                AdbShell.StopAndGetLog(_selectedDevice.Id, path);
+            }  
+
+        }
+
+        #endregion //Reset Command
+
+        #region Screenshot Command
+
+        private ICommand _screenshotCommand;
+
+        public ICommand ScreenshotCommand
+        {
+            get
+            {
+                if (_screenshotCommand == null)
+                {
+                    _screenshotCommand = new RelayCommand(
+                        param => this.TakeScreenshot(),
+                        param => this.CanScreenshot()
+                    );
+                }
+                return _screenshotCommand;
+            }
+        }
+
+        private bool CanScreenshot()
+        {
+            return (_selectedDevice != null && !String.IsNullOrEmpty(_selectedDevice.Id));
+        }
+
+        private void TakeScreenshot()
+        {
+            var screenshotName = AdbShell.MakeScreenshot(_selectedDevice.Id);
+
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+
+            saveFileDialog.FileName = screenshotName + ".png";
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                string path = saveFileDialog.FileName;
+                //StatusBar.DeviceStatusBar = "Downloading file...";
+                AdbShell.TakeScreenshot(_selectedDevice.Id, screenshotName, path);
+            }  
+
+
+        }
+
+        #endregion //Reset Command
+
         #region Download Command
 
         private ICommand _downloadCommand;
@@ -355,27 +468,36 @@ namespace QvcTesterTool
         private void DownloadObject(object build)
         {
             string downloadLink;
-            string addressLink = "https://dl.dropbox.com/u/25719532/apps/android_{0}_{2}_{1}/QVC_{0}_{3}{4}_{1}.apk";
             string buildParameters = build as string;
             string[] parameters = buildParameters.Split('_');
+            string webAdress;
 
-     
-            string extraBuildKind = "TabletOpt";
             if (parameters.Length == 4)
             {
-                if (parameters[0] == "uk") extraBuildKind = "Fragment_";
-                downloadLink = String.Format(addressLink, parameters[0], parameters[1], "fragment_ci", extraBuildKind, "_ci");
+                webAdress = DataStrings.webAdress.Replace("*culture*", parameters[0]).Replace("*type*", parameters[1]).Replace("*kind*", parameters[2] + "_" + parameters[3]);
             }
-            else
-            if (parameters.Length == 3)
+            else if (parameters.Length == 3)
             {
-                downloadLink = String.Format(addressLink, parameters[0], parameters[1], "tabletopt", extraBuildKind, "");
+                webAdress = DataStrings.webAdress.Replace("*culture*", parameters[0]).Replace("*type*", parameters[1]).Replace("*kind*", parameters[2]);
             }
 
             else
             {
                 return;
             }
+
+            string webSource;
+            string pattrn = "<div class=\"link\"><a href=\"(.*).apk";
+            Regex regexWeb = new Regex(pattrn);
+
+            
+            using (var client = new WebClient())
+            {
+                webSource = client.DownloadString(new Uri(webAdress));
+            }
+            
+
+            downloadLink = regexWeb.Match(webSource).Groups[1].Value + ".apk";
 
             SaveFileDialog saveFileDialog = new SaveFileDialog();
 
@@ -410,7 +532,6 @@ namespace QvcTesterTool
             {
                 return;
             }
-
         }
 
         private void DownloadFileCompleted(object sender, AsyncCompletedEventArgs e)
@@ -424,15 +545,9 @@ namespace QvcTesterTool
 
         private async void StatusBarChangedAsync()
         {
-            await Task.Delay(5000);
+            await Task.Delay(3000);
             StatusBar.DownloadStatusBar = "";
         }
-
-        //public async void InstallApk(string path)
-        //{
-        //    await AdbShell.InstallApkAsync(path, _selectedDevice.Id);
-        //    _selectedDevice.UpdatePackagesList();
-        //}
 
         #endregion //Download Command
 
@@ -501,10 +616,14 @@ namespace QvcTesterTool
 
         #endregion // INotifyPropertyChanged Implementation
 
+        #region Install apk
+
         public async void InstallApk(string path)
         {
             await AdbShell.InstallApkAsync(path, _selectedDevice.Id);
             _selectedDevice.UpdatePackagesList();
         }
+
+        #endregion
     }
 }
